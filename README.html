@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+</head>
+<body>
+<h1 id="gitting-started">Gitting started</h1>
+<h2 id="cloning-this-repository">Cloning this repository</h2>
+<p>The first step is to <code>clone</code> the central repository, this creates a local copy of the entire project.</p>
+<p><code>$ git clone https://github.com/lukevf/GDPTest.git</code></p>
+<p>N.B. when you clone a repository git creates a shortcut <code>origin</code> that points to the original file location (GitHub) and it's really useful.</p>
+<h2 id="working-on-your-local-repository">Working on your local repository</h2>
+<p>Once the files are on you computer you can modify and change them without effecting the files on the central repository. The basic local Git process is edit, stage commit. In git a commit is the file eqivelant of a save point in a game that you can revert back to if you get killed by evil bugs with laser guns. This is the first huge benefit of git. Staging is the process of selcting which files to include in a particular commit. The following commands are used for this:-</p>
+<ul>
+<li><code>git status</code> shows the state of your local repository: which files have been changed; which files are staged and files which aren't currentley being managed by git.</li>
+<li><code>git add &lt;file&gt;</code> stages a file for commit.</li>
+<li><code>git commit</code> commits the staged files. N.B. Each commit requires a log entry -- a description of what you've done. If you run <code>git commit</code> it opens vim where you type in you log entry and then write an quit. To save youself the vim hassle you can just run <code>git commit -m &quot;&lt;message for log&gt;&quot;</code> instead.</li>
+<li><code>git checkout -- &lt;file&gt;</code> restores a file to it's last committed state</li>
+</ul>
+<h2 id="publishing-you-new-code">Publishing you new code</h2>
+<p>Once you are happy with all of your local changes it is time to <code>push</code> the new code to the GitHub using the command.</p>
+<p><code>git push origin master</code></p>
+<p>If somebody has pushed changes to GitHub, you can pull the changes so that your local copy is up to date.</p>
+<p><code>git pull origin master</code></p>
+<p>If in the interval between your last <code>pull</code> and wanting to <code>push</code> someone else has <code>push</code>ed to GitHub you need to intergate thier commits with you own. The challenge is shown schematically below. <code>origin/master</code> is pulled at commit 0 to <code>local/master</code>. The local files (<code>local/master</code>) are then modified and in the process two commits (A and B) are made. In the meantime someone else has pushed thier 3 commits (1, 2 and 3) to GitHub.</p>
+<pre><code>                                    om
+origin/master: --- 0 --- 1 --- 2 --- 3
+                    \
+local/master :       --- A --- B
+                              lm</code></pre>
+<p>When this happens <code>git push origin master</code> returns an error. To integrate the commits run the following:-</p>
+<p><code>git pull --rebase origin master</code></p>
+<p>Using <code>--rebase</code> changes the tree so that you aren't trying to merge the branches but instead concate them. See the schematic below.</p>
+<pre><code>                                    om
+origin/master: --- 0 --- 1 --- 2 --- 3
+                                      \
+local/master :                         --- A --- B
+                                                lm</code></pre>
+<p>Sometimes there will be a conflict (two people have changed the same file) in which case git gives the following message:-</p>
+<p><code>CONFLICT (content): Merge conflict in &lt;some-file&gt;</code></p>
+<p>In this case git will pause the rebase at the commit that caused the conflict. Running <code>git status</code> will list the conflicts. Edit <code>&lt;some-file&gt;</code> so that it works and then continue the rebase.</p>
+<pre><code>git add &lt;some-file&gt;
+git rebase --continue</code></pre>
+<p>N.B. If it's got confusing <code>git rebase --abort</code> takes you back to where you were before running <code>git pull --rebase origin master</code> (few).</p>
+<p>Once the rebase is finished you can <code>push</code> using the original command resulting in a beautiful git rebase.</p>
+<pre><code>                                                om
+origin/master: --- 0 --- 1 --- 2 --- 3 --- A --- B
+                                                  \
+local/master :                                     -
+                                                  lm</code></pre>
+</body>
+</html>
